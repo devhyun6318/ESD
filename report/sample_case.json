@@ -1,0 +1,77 @@
+{
+  "operator": "[Operator name]",
+  "date": "2025-07-12",
+  "case_id": "11-39-41",
+  "case": {
+    "title": "Gastric ESD — Early gastric cancer, antrum",
+    "location": "Antrum, lesser curv.",
+    "lesion_size_mm": [
+      30,
+      30
+    ],
+    "difficulty_level": 4,
+    "difficulty_label": "High"
+  },
+  "overall": {
+    "grade": "A+",
+    "score": 100,
+    "percentile_top": 1,
+    "process_score": 40,
+    "process_max": 40,
+    "verdict": "Pass / Excellent"
+  },
+  "phases": [
+    {
+      "key": "marking",
+      "name": "Marking",
+      "duration_sec": 30,
+      "score": 10,
+      "comment": "~5 mm margin around the full circumference; uniform dot spacing; complete closed loop."
+    },
+    {
+      "key": "injection",
+      "name": "Injection",
+      "duration_sec": 85,
+      "score": 10,
+      "comment": "Sufficient submucosal cushion; uniform elevation along the whole incision line; accurate injection."
+    },
+    {
+      "key": "precut",
+      "name": "Precut",
+      "duration_sec": 115,
+      "score": 10,
+      "comment": "Incision placed just outside the marks; appropriate depth; continuous 360° incision with stable hemostasis."
+    },
+    {
+      "key": "dissection",
+      "name": "Dissection",
+      "duration_sec": 360,
+      "score": 10,
+      "comment": "Direct visualization throughout (no blind dissection); consistent mid-submucosal plane; clean ulcer bed."
+    }
+  ],
+  "outcomes": [
+    {
+      "name": "En bloc resection",
+      "detail": "Single-piece resection completed on video",
+      "status": "achieved"
+    },
+    {
+      "name": "R0 resection",
+      "detail": "Lateral margin 3.1 mm · vertical margin negative",
+      "status": "achieved"
+    },
+    {
+      "name": "Muscle layer injury",
+      "detail": "No muscle layer injury observed during dissection",
+      "status": "none"
+    },
+    {
+      "name": "Perforation",
+      "detail": "No perforation · post-procedure free air negative",
+      "status": "none"
+    }
+  ],
+  "specimen_scan_image": null,
+  "footer": "ESD Procedure Assessment Report · standard format v0.1 · case info & outcomes are mockup data"
+}
