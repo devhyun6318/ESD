@@ -186,7 +186,7 @@
   "date": "2025-07-12",
   "case_id": "11-39-41",
   "case": {
-    "title": "Gastric ESD — Early gastric cancer, antrum",
+    "title": "Gastric ESD",
     "location": "Antrum, lesser curv.",
     "lesion_size_mm": [
       30,
@@ -256,7 +256,7 @@
     }
   ],
   "specimen_scan_image": null,
-  "footer": "ESD Procedure Assessment Report · standard format v0.1 · case info & outcomes are mockup data"
+  "footer": "ESD Procedure Assessment Report · standard format v0.1"
 }
 </script>
 
@@ -407,12 +407,12 @@
       '<div><dt>Overall difficulty</dt><dd' + (isNum(d.case.difficulty_level) ? ' class="rust"' : "") + ">" + esc(diffText) + "</dd></div></dl></div>" +
       '<div class="overall"><div class="label">Overall assessment</div><div class="grade-row">' + overallHtml + "</div></section>" +
 
-      '<div class="section-head"><h2>Procedure Phase Assessment</h2><span class="aside">Total procedure time ' + Math.floor(total / 60) + " min " + pad(total % 60) + " s</span></div>" +
+      '<div class="section-head"><h2>Evaluation by Procedural Phase</h2></div>' +
       '<section class="phases"><table><thead><tr><th>Phase</th><th>Duration</th><th>Share</th><th>Score</th></tr></thead><tbody>' + rows + "</tbody></table>" +
       '<div class="donut-wrap">' + donut(d.phases, total) + '<div class="legend">' + legend + "</div></div></section>" +
       '<ul class="comments">' + comments + "</ul>" +
 
-      '<div class="section-head"><h2>Resection Outcome</h2></div>' +
+      '<div class="section-head"><h2>Evaluation of Procedural Outcome</h2></div>' +
       '<section class="outcome"><div><div class="scan' + (d.specimen_scan_image ? " has-img" : "") + '">' + scan + '</div><p class="caption">Fig. 1 3D scan of the resected specimen · depth distribution and margin measurement</p></div>' +
       '<div class="results">' + results + "</div></section>" +
 

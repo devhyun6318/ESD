@@ -3,7 +3,7 @@
   "date": "2025-07-12",
   "case_id": "11-39-41",
   "case": {
-    "title": "Gastric ESD — Early gastric cancer, antrum",
+    "title": "Gastric ESD",
     "location": "Antrum, lesser curv.",
     "lesion_size_mm": [
       30,
@@ -73,5 +73,5 @@
     }
   ],
   "specimen_scan_image": null,
-  "footer": "ESD Procedure Assessment Report · standard format v0.1 · case info & outcomes are mockup data"
+  "footer": "Procedure Assessment Report · standard format v0.1"
 }
