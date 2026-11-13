@@ -7,9 +7,13 @@
 !/esd_pipeline.py
 !/esd_report.py
 !/requirements.txt
+!/demo/
 
 # 채점 결과는 올리지 않는다 (각자 실행해서 만든다)
 /report/cases/
+/demo/report/cases/
+/demo/trial/
+__pycache__/
 
 # 시술 영상·클립은 어디에 있든 올리지 않는다 (환자 데이터, GitHub 100MB 제한)
 *.mkv
