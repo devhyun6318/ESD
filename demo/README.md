@@ -19,9 +19,9 @@ cp .env.example .env                     # .env 에 GEMINI_API_KEY 넣기 (demo/
 2. 실행:
    ```bash
    cd demo
-   python3 esd_report.py                    # demo/ 안의 영상 사용 (여러 개면 번호로 고르기)
-   python3 esd_report.py "/다른/경로/영상.mkv" # 다른 위치의 영상
-   python3 esd_report.py --no-score         # 채점 없이 이미 만든 보고서만 열기
+   python3 esd_score.py                    # demo/ 안의 영상 사용 (여러 개면 번호로 고르기)
+   python3 esd_score.py "/다른/경로/영상.mkv" # 다른 위치의 영상
+   python3 esd_score.py --no-score         # 채점 없이 이미 만든 보고서만 열기
    ```
 3. 브라우저에 보고서가 열린다 (`http://127.0.0.1:8090/?case=<케이스>`). Ctrl+C 로 종료.
 

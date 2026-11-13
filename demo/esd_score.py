@@ -6,9 +6,9 @@
     4. report/server.py (웹 배포와 같은 서버·같은 report.html) 를 로컬에서 띄우고 ?case=<case_id> 를 연다
 
 usage:
-    python3 esd_report.py "/경로/2025-07-12 11-39-41.mkv"
-    python3 esd_report.py                       # demo/ 안의 영상 사용 (여러 개면 고르기)
-    python3 esd_report.py 영상.mkv --no-score    # 채점 없이 이미 있는 결과만 띄우기
+    python3 esd_score.py "/경로/2025-07-12 11-39-41.mkv"
+    python3 esd_score.py                       # demo/ 안의 영상 사용 (여러 개면 고르기)
+    python3 esd_score.py 영상.mkv --no-score    # 채점 없이 이미 있는 결과만 띄우기
     Ctrl+C 로 서버 종료
 """
 
