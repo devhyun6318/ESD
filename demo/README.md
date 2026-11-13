@@ -31,35 +31,21 @@ Ctrl+C 로 종료.
 
 ## 모델 바꾸기
 
+`--model` 뒤에 아래 모델 이름을 넣는다. `--force` 를 붙이면 새 모델로 구간 판단부터 다시 한다 (안 붙이면 저장된 구간·점수를 그대로 씀).
+
 ```bash
-python3 esd_score.py --model gemini-3.8-flash            # 이번 실행만
-python3 esd_score.py --model gemini-3.8-flash --force    # 새 모델로 구간부터 다시
+python3 esd_score.py --model gemini-3.6-flash --force    # 기본값, 현재 결과가 가장 좋음
+python3 esd_score.py --model gemini-3.7-flash --force
+python3 esd_score.py --model gemini-3.8-flash --force    # 503(사용량 많음)이 잦음
+python3 esd_score.py --model gemini-4-argon --force
+python3 esd_score.py --model gemini-4-carbon --force
+python3 esd_score.py --model gemini-4-hydrogen --force
+python3 esd_score.py --model gemini-3.1-pro-preview --force
+python3 esd_score.py --model gemini-2.5-pro --force
 ```
 
+- 영상을 보고 판단해야 하므로 영상 입력이 되는 일반 모델만 적었다. `*-lite` 모델은 단계 판단이 부정확해서 뺐다.
 - 기본값을 바꾸려면 `esd_pipeline.py` 의 `MODEL = "gemini-3.6-flash"` 를 고친다.
-- `--force` 없이 모델만 바꾸면 이미 저장된 구간·점수를 그대로 쓴다.
-
-## 사용 가능한 모델
-
-영상 입력이 되는 텍스트 생성 모델 (2026-11-13 기준, 키로 조회한 목록):
-
-| 모델 | 무료 tier | 비고 |
-|---|---|---|
-| `gemini-3.6-flash` | O | 기본값, 현재 결과가 가장 좋음 |
-| `gemini-3.8-flash` | O | 503(사용량 많음)이 잦음 |
-| `gemini-3.5-flash-lite` | O | 가볍지만 단계 판단이 부정확 (Marking 을 놓침) |
-| `gemini-4-argon` | X (유료) | |
-| `gemini-3.7-flash`, `gemini-3.5-flash` | 미확인 | |
-| `gemini-4-carbon`, `gemini-4-hydrogen` | 미확인 | |
-| `gemini-flash-latest`, `gemini-pro-latest`, `gemini-flash-lite-latest` | 미확인 | 최신 버전을 가리키는 별칭 |
-| `gemini-3.1-pro-preview`, `gemini-3.1-flash-lite`, `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.5-flash-lite` | 미확인 | 이전 세대 |
-
-지금 키로 쓸 수 있는 전체 목록:
-
-```bash
-cd demo
-python3 -c "from google import genai; import esd_pipeline as e; e.load_env(); c = genai.Client(); [print(m.name) for m in c.models.list() if 'generateContent' in (m.supported_actions or [])]"
-```
 
 ## 무료 tier
 
