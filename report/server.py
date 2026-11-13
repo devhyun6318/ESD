@@ -2,10 +2,12 @@
 
   /                  -> report.html
   /sample_case.json  -> 보고서가 읽는 데이터 (페이지 내부용)
+  /cases/<id>.json   -> esd_pipeline.py 가 만든 케이스 (보고서에서 ?case=<id>), /cases/index.json = 목록
   그 외               -> 404 (디렉터리 목록 없음)
 
 사용: python3 server.py [포트]   (기본 8090, 127.0.0.1에만 바인딩 → ngrok으로 공개)
 """
+import re
 import sys
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -26,7 +28,11 @@ class ReportHandler(SimpleHTTPRequestHandler):
         self._serve(send_body=False)
 
     def _serve(self, send_body):
-        route = ROUTES.get(self.path.split("?", 1)[0])
+        path = self.path.split("?", 1)[0]
+        route = ROUTES.get(path)
+        m = re.fullmatch(r"/cases/([\w.-]+)\.json", path)  # 파일 이름만 허용 (../ 등 경로 이동 차단)
+        if route is None and m and (ROOT / "cases" / f"{m.group(1)}.json").is_file():
+            route = (f"cases/{m.group(1)}.json", "application/json; charset=utf-8")
         if route is None:
             self.send_error(HTTPStatus.NOT_FOUND)
             return

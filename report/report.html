@@ -97,7 +97,8 @@
     .editor, .panel-toggle { display: none !important; }
     .app { display: block; }
     .preview { padding: 0; overflow: visible; }
-    .page { margin: 0; box-shadow: none; height: 297mm; overflow: hidden; }
+    .page { margin: 0; box-shadow: none; height: 297mm; overflow: hidden; break-after: page; }
+    .page:last-child { break-after: auto; }
   }
 
   .header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
@@ -175,6 +176,18 @@
 
   .footer { margin-top: auto; padding-top: 8px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
   .spacer { min-height: 18px; }
+
+  /* 2쪽: 단계별 세부 항목 (AI 채점 결과에 items 가 있을 때만) */
+  .page[hidden] { display: none; }
+  .detail td, .detail th { vertical-align: top; text-align: left !important; font-weight: 400; }
+  .detail td { font-size: 11.5px; line-height: 1.45; padding: 7px 4px; }
+  .detail td:first-child { width: 96px; }
+  .detail td:nth-child(2) { width: 150px; font-weight: 600; color: var(--ink); }
+  .detail td:nth-child(3) { width: 44px; text-align: center !important; font-weight: 600; }
+  .detail td:nth-child(4) { color: var(--text); }
+  .detail .ev { display: block; color: var(--muted); font-size: 10.5px; margin-top: 2px; }
+  .detail .ko { display: block; color: var(--muted); font-size: 10.5px; font-weight: 400; }
+  .editor-head select { font: inherit; font-size: 12px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--card); color: var(--ink); max-width: 130px; }
 </style>
 </head>
 <body>
@@ -264,17 +277,19 @@
   <aside class="editor" aria-label="보고서 입력">
     <div class="editor-head">
       <h2>시술 정보 입력</h2>
+      <select id="case-select" aria-label="케이스 선택" hidden></select>
       <button type="button" class="primary" id="btn-print">PDF로 저장</button>
     </div>
     <div class="editor-body" id="editor"></div>
   </aside>
   <button type="button" class="panel-toggle" id="panel-toggle" aria-label="입력 패널 숨기기" aria-expanded="true">&lt;</button>
-  <div class="preview"><main class="page" id="page"></main></div>
+  <div class="preview"><main class="page" id="page"></main><main class="page" id="page2" hidden></main></div>
 </div>
 
 <script>
 (function () {
-  var STORAGE_KEY = "esd-report-draft-v1";
+  // 입력 초안은 케이스별로 따로 저장
+  var STORAGE_KEY = "esd-report-draft-v1" + (new URLSearchParams(location.search).get("case") ? ":" + new URLSearchParams(location.search).get("case") : "");
   var PHASE_COLORS = { marking: "--c-marking", injection: "--c-injection", precut: "--c-precut", dissection: "--c-dissection" };
   var DIFFICULTY_LABELS = { 1: "Very low", 2: "Low", 3: "Moderate", 4: "High", 5: "Very high" };
   // status → [badge text, style, 입력창 표시명]. pending: 병리(R0)·영상(free air)처럼 시술 직후엔 확정 안 되는 항목용.
@@ -397,6 +412,7 @@
           '<path d="M0 40H140M70 0V80" stroke="var(--placeholder-line)" stroke-width="1" stroke-dasharray="4 3"/></svg>' +
         '<span class="ph-label">[ 3D scan of resected specimen ]</span>';
 
+    var hasItems = d.phases.some(function (p) { return p.items && p.items.length; });
     document.getElementById("page").innerHTML =
       '<header class="header"><div><div class="eyebrow">Endoscopic Submucosal Dissection</div><h1>Procedure Assessment Report</h1></div>' +
       '<div class="meta"><div class="op">Operator : ' + esc(d.operator) + '</div><div class="sub">Date ' + esc(d.date) + " · Case ID " + esc(d.case_id) + "</div></div></header>" +
@@ -416,7 +432,28 @@
       '<section class="outcome"><div><div class="scan' + (d.specimen_scan_image ? " has-img" : "") + '">' + scan + '</div><p class="caption">Fig. 1 3D scan of the resected specimen · depth distribution and margin measurement</p></div>' +
       '<div class="results">' + results + "</div></section>" +
 
-      '<div class="spacer"></div><footer class="footer"><span>' + esc(d.footer) + "</span><span>1 / 1</span></footer>";
+      '<div class="spacer"></div><footer class="footer"><span>' + esc(d.footer) + "</span><span>1 / " + (hasItems ? 2 : 1) + "</span></footer>";
+
+    // 2쪽: 세부 항목별 점수와 근거
+    var page2 = document.getElementById("page2");
+    page2.hidden = !hasItems;
+    if (!hasItems) { page2.innerHTML = ""; return; }
+    var detailRows = d.phases.map(function (p) {
+      return (p.items || []).map(function (it, j) {
+        return "<tr><td>" + (j ? "" : '<i class="sw" style="background:' + color(p.key) + '"></i>' + esc(p.name) +
+          (p.start ? '<span class="ev">' + esc(p.start) + " – " + esc(p.end) + "</span>" : "")) + "</td>" +
+          "<td>" + esc(it.criterion) + '<span class="ko">' + esc(it.criterion_ko || "") + "</span></td>" +
+          "<td>" + esc(it.score) + " / " + esc(it.max) + "</td>" +
+          "<td>" + esc(it.finding) + (it.evidence ? '<span class="ev">Evidence: ' + esc(it.evidence) + "</span>" : "") + "</td></tr>";
+      }).join("");
+    }).join("");
+    page2.innerHTML =
+      '<header class="header"><div><div class="eyebrow">Endoscopic Submucosal Dissection</div><h1>Detailed Phase Assessment</h1></div>' +
+      '<div class="meta"><div class="op">Operator : ' + esc(d.operator) + '</div><div class="sub">Date ' + esc(d.date) + " · Case ID " + esc(d.case_id) + "</div></div></header>" +
+      '<div class="section-head"><h2>Scoring Criteria and Findings</h2></div>' +
+      '<table class="detail"><thead><tr><th>Phase</th><th>Criterion</th><th>Score</th><th>Findings</th></tr></thead><tbody>' + detailRows + "</tbody></table>" +
+      '<div class="spacer"></div><footer class="footer"><span>' + esc(d.footer) + (d.generated_by ? " · AI scoring: " + esc(d.generated_by) : "") +
+      "</span><span>2 / 2</span></footer>";
   }
 
   /* ───────── Editor ───────── */
@@ -552,16 +589,32 @@
   update();
 
   // nginx 등 웹 서버로 열면 옆의 sample_case.json을 우선 사용 (파일만 바꾸면 보고서가 바뀜).
-  // file://로 열면 위의 내장 데이터를 사용.
+  // ?case=<id> 이면 cases/<id>.json (esd_pipeline.py 가 만든 AI 채점 결과). file://로 열면 위의 내장 데이터를 사용.
   if (/^https?:$/.test(location.protocol)) {
-    fetch("sample_case.json", { cache: "no-store" })
+    var caseId = new URLSearchParams(location.search).get("case");
+    var src = caseId ? "cases/" + encodeURIComponent(caseId) + ".json" : "sample_case.json";
+    fetch(src, { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (d) {
         defaults = normalize(d);
         state = load() || clone(defaults);
         buildEditor(); update();
       })
-      .catch(function (e) { console.warn("sample_case.json 로드 실패, 내장 데이터 사용:", e); });
+      .catch(function (e) { console.warn(src + " 로드 실패, 내장 데이터 사용:", e); });
+
+    // 케이스 목록이 있으면 선택 상자를 보여준다
+    var sel = document.getElementById("case-select");
+    fetch("cases/index.json", { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (ids) {
+        if (!ids.length) return;
+        sel.innerHTML = '<option value="">Sample</option>' + ids.map(function (id) {
+          return '<option value="' + esc(id) + '"' + (id === caseId ? " selected" : "") + ">" + esc(id) + "</option>";
+        }).join("");
+        sel.hidden = false;
+        sel.addEventListener("change", function () { location.search = sel.value ? "?case=" + encodeURIComponent(sel.value) : ""; });
+      })
+      .catch(function () { /* 케이스 없음 */ });
   }
 })();
 </script>
