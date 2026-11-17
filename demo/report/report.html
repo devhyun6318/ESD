@@ -70,6 +70,8 @@
   .field textarea { resize: vertical; min-height: 52px; line-height: 1.4; }
   .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--navy-bar); outline-offset: -1px; border-color: var(--accent); }
   .field input[readonly] { background: var(--bg); }
+  .check { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); cursor: pointer; }
+  .check input { width: auto; margin: 0; }
   .dur { display: flex; align-items: center; gap: 4px; }
   .dur input { text-align: center; }
   .sub-head { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--ink); margin-top: 6px; padding-top: 8px; border-top: 1px dashed var(--rowline); }
@@ -413,6 +415,7 @@
         '<span class="ph-label">[ 3D scan of resected specimen ]</span>';
 
     var hasItems = d.phases.some(function (p) { return p.items && p.items.length; });
+    var showDetail = hasItems && !!d.show_details;  // 2쪽은 입력 패널에서 켰을 때만 (기본: 숨김)
     document.getElementById("page").innerHTML =
       '<header class="header"><div><div class="eyebrow">Endoscopic Submucosal Dissection</div><h1>Procedure Assessment Report</h1></div>' +
       '<div class="meta"><div class="op">Operator : ' + esc(d.operator) + '</div><div class="sub">Date ' + esc(d.date) + " · Case ID " + esc(d.case_id) + "</div></div></header>" +
@@ -432,12 +435,12 @@
       '<section class="outcome"><div><div class="scan' + (d.specimen_scan_image ? " has-img" : "") + '">' + scan + '</div><p class="caption">Fig. 1 3D scan of the resected specimen · depth distribution and margin measurement</p></div>' +
       '<div class="results">' + results + "</div></section>" +
 
-      '<div class="spacer"></div><footer class="footer"><span>' + esc(d.footer) + "</span><span>1 / " + (hasItems ? 2 : 1) + "</span></footer>";
+      '<div class="spacer"></div><footer class="footer"><span>' + esc(d.footer) + "</span><span>1 / " + (showDetail ? 2 : 1) + "</span></footer>";
 
     // 2쪽: 세부 항목별 점수와 근거
     var page2 = document.getElementById("page2");
-    page2.hidden = !hasItems;
-    if (!hasItems) { page2.innerHTML = ""; return; }
+    page2.hidden = !showDetail;
+    if (!showDetail) { page2.innerHTML = ""; return; }
     var detailRows = d.phases.map(function (p) {
       return (p.items || []).map(function (it, j) {
         return "<tr><td>" + (j ? "" : '<i class="sw" style="background:' + color(p.key) + '"></i>' + esc(p.name) +
@@ -479,6 +482,10 @@
       field("시술자", input("operator", d.operator), true) +
       field("시술일", input("date", d.date, 'type="date"')) +
       field("Case ID", input("case_id", d.case_id)) +
+      (d.phases.some(function (p) { return p.items && p.items.length; })
+        ? '<label class="check"><input type="checkbox" id="show-details"' + (d.show_details ? " checked" : "") +
+          "> 세부 평가 페이지 (Detailed Phase Assessment) 보이기</label>"
+        : "") +
       "</div></details>";
 
     html += '<details open><summary>케이스</summary><div class="fields">' +
@@ -549,6 +556,8 @@
       var row = editor.querySelectorAll('[data-dur="' + i + '"]');
       var m = Math.max(0, num(row[0].value, 0)), s = Math.max(0, num(row[1].value, 0));
       state.phases[i].duration_sec = Math.round(m * 60 + s);
+    } else if (t.id === "show-details") {
+      state.show_details = t.checked;
     } else if (t.dataset.path) {
       var numeric = t.type === "number" || t.tagName === "SELECT" && /difficulty_level/.test(t.dataset.path);
       setPath(state, t.dataset.path, numeric ? num(t.value, null) : t.value);
