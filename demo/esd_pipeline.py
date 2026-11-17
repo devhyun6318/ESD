@@ -25,6 +25,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from google import genai
@@ -527,8 +528,9 @@ def case_info(video):
 
 def write_report(video, stem, segs, scores, out_dir):
     case = json.loads(TEMPLATE.read_text())
-    date, case["case_id"] = case_info(video)
-    case["date"] = date or case["date"]
+    _, case["case_id"] = case_info(video)
+    # 보고서 날짜 = 실행 시점의 한국 날짜 (영상 파일명 날짜 아님). 서버가 UTC 여도 KST 로 계산
+    case["date"] = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
     case["phases"] = []
     for k, name, _ in PHASES:
         if k not in segs:
